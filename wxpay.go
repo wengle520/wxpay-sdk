@@ -46,7 +46,7 @@ func (wxp *WXPay) unifiedOrder(reqData Params) (Params, error) {
 	if err != nil {
 		return nil, err
 	}
-	return processResponseXml(respXml)
+	return wxp.processResponseXml(respXml)
 }
 
 /**

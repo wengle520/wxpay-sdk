@@ -142,7 +142,7 @@ func MapToXml(data Params) string {
  * @throws Exception
  */
 func XmlToMap(strXML string) (Params, error) {
-	data := make(map[string]string)
+	data := make(Params)
 	reader := bytes.NewReader([]byte(strXML))
 	dec := xml.NewDecoder(reader)
 	key, value := "", ""
@@ -191,4 +191,8 @@ func IsSignatureValid(data Params, apiKey string, signType SignTypeEnum) (bool, 
 		return false, err
 	}
 	return genSign == sign, nil
+}
+
+func GetCurrentTimestampMs() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
 }

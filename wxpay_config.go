@@ -1,19 +1,27 @@
 package wxpay
 
-import "io"
-
 type WXPayConfig struct {
 	appID                string
 	mchID                string
 	apiKey               string
-	certStream           io.Reader
+	cert                 string  // 证书文件路径
 	httpConnectTimeoutMs int
 	httpReadTimeoutMs    int
-	//wxPayDomain          IWXPayDomain
+	wxPayDomain          IWXPayDomain
 	autoReport           bool
 	reportWorkerNum      int
 	reportQueueMaxSize   int
 	reportBatchSize      int
+}
+
+var configIns *WXPayConfig
+
+func InitConfig(configFile string) {
+	configIns = &WXPayConfig{}
+}
+
+func GetConfigInstance() *WXPayConfig {
+	return configIns
 }
 
 ///**
