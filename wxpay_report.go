@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 	"sync"
 	"time"
@@ -71,6 +72,35 @@ func (ri *ReportInfo) String() string {
 		", firstHasConnectTimeout=" + strconv.Itoa(ri.firstHasConnectTimeout) +
 		", firstHasReadTimeout=" + strconv.Itoa(ri.firstHasReadTimeout) +
 		"}"
+}
+
+func (ri *ReportInfo) toLineString(apiKey string) (string, error) {
+	separator := ","
+	buffer := new(bytes.Buffer)
+
+	v := reflect.ValueOf(ri)
+	count := v.NumField()
+	for i := 0; i < count; i++ {
+		f := v.Field(i)
+		switch f.Kind() {
+		case reflect.String:
+			buffer.WriteString(f.String())
+		case reflect.Int:
+			buffer.WriteString(strconv.FormatInt(f.Int(), 10))
+		case reflect.Int64:
+			buffer.WriteString(strconv.FormatInt(f.Int(), 10))
+		case reflect.Bool:
+			buffer.WriteString(strconv.FormatBool(f.Bool()))
+		default:
+			buffer.WriteString(fmt.Sprintf("%v", f))
+		}
+		buffer.WriteString(separator)
+	}
+
+	sign := GenHMACSHA256(buffer, apiKey)
+	buffer.WriteString(sign)
+
+	return buffer.String(), nil
 }
 
 type WXPayReport struct {
@@ -143,8 +173,20 @@ func GetReportInstance(config *WXPayConfig) *WXPayReport {
 func (wxr *WXPayReport) Report(uuid string, elapsedTimeMillis int64,
 	firstDomain string, primaryDomain bool, firstConnectTimeoutMillis int, firstReadTimeoutMillis int,
 	firstHasDnsError bool, firstHasConnectTimeout bool, firstHasReadTimeout bool) {
+	configIns := GetConfigInstance()
 	currentTimestamp := GetCurrentTimestampMs()
-
+	reportInfo := NewReportInfo(uuid, currentTimestamp, elapsedTimeMillis,
+		firstDomain, primaryDomain, firstConnectTimeoutMillis, firstReadTimeoutMillis,
+		firstHasDnsError, firstHasConnectTimeout, firstHasReadTimeout)
+	data, err := reportInfo.toLineString(configIns.apiKey)
+	if err != nil {
+		errMsg := fmt.Sprintf("convert to cvs format failed: %s", err)
+		fmt.Println(errMsg)
+	}
+	fmt.Printf("report %s\n", data)
+	if data != "" {
+		wxr.reportMsgQueue <- data
+	}
 }
 
 func (wxr *WXPayReport) httpRequest(data string, connectTimeoutMs int, readTimeoutMs int) (string, error) {

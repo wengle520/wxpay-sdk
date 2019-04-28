@@ -20,7 +20,7 @@ type WXPay struct {
 * @return API返回数据
 * @throws Exception
 */
-func (wxp *WXPay) unifiedOrder(reqData Params) (Params, error) {
+func (wxp *WXPay) UnifiedOrder(reqData Params) (Params, error) {
 	var url string
 	if wxp.useSandbox {
 		url = SANDBOX_UNIFIEDORDER_URL_SUFFIX
@@ -77,18 +77,18 @@ func (wxp *WXPay) fillRequestData(reqData Params, apiKey string, signType SignTy
 * @throws Exception
 */
 func (wxp *WXPay) processResponseXml(xmlStr string) (Params, error) {
-	RETURN_CODE := "return_code"
+	returnCodeKey := "return_code"
 	returnCode := ""
 	respData, err := XmlToMap(xmlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, ok := respData[RETURN_CODE]; !ok {
+	if _, ok := respData[returnCodeKey]; !ok {
 		errMsg := fmt.Sprintf("No `return_code` in XML: %s", xmlStr)
 		return nil, errors.New(errMsg)
 	}
-	returnCode = respData[RETURN_CODE]
+	returnCode = respData[returnCodeKey]
 	if returnCode == FAIL {
 		return respData, nil
 	} else if returnCode == SUCCESS {

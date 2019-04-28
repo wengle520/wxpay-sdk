@@ -196,3 +196,19 @@ func IsSignatureValid(data Params, apiKey string, signType SignTypeEnum) (bool, 
 func GetCurrentTimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
+
+/**
+ * 生成 HMACSHA256
+ * @param data 待处理数据
+ * @param key 密钥
+ * @return 加密结果
+ * @throws Exception
+ */
+func GenHMACSHA256(buffer *bytes.Buffer, apiKey string) string {
+	var sha256Set []byte
+	h := hmac.New(sha256.New, []byte(apiKey))
+	h.Write(buffer.Bytes())
+	sha256Set = h.Sum(nil)
+	sign := hex.EncodeToString(sha256Set[:])
+	return sign
+}
