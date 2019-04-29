@@ -185,7 +185,16 @@ func (wxr *WXPayReport) Report(uuid string, elapsedTimeMillis int64,
 	}
 	fmt.Printf("report %s\n", data)
 	if data != "" {
-		wxr.reportMsgQueue <- data
+		ok := false
+		select {
+		case wxr.reportMsgQueue <- data:
+			ok = true
+		default:
+			ok = false
+		}
+		if !ok {
+			fmt.Printf("current reportMsgQueue has full, discard report: %s\n", data)
+		}
 	}
 }
 
