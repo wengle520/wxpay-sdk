@@ -1,0 +1,10 @@
+appID : wx2421b1c4370ec43b
+mchID : 10000100
+apiKey : xxx
+cert : /home/xxx/.cert
+httpConnectTimeoutMs : 6000
+httpReadTimeoutMs : 8000
+autoReport : true
+reportWorkerNum : 6
+reportQueueMaxSize : 10000
+reportBatchSize : 10
