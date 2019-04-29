@@ -1,13 +1,18 @@
 package wxpay
 
+import (
+	"fmt"
+	"github.com/kylelemons/go-gypsy/yaml"
+)
+
 type WXPayConfig struct {
 	appID                string
 	mchID                string
 	apiKey               string
-	cert                 string  // 证书文件路径
+	cert                 string // 证书文件路径
 	httpConnectTimeoutMs int
 	httpReadTimeoutMs    int
-	wxPayDomain          IWXPayDomain
+	wxPayDomain          IWXPayDomain // SDK的使用者负责赋值
 	autoReport           bool
 	reportWorkerNum      int
 	reportQueueMaxSize   int
@@ -16,56 +21,31 @@ type WXPayConfig struct {
 
 var configIns *WXPayConfig
 
-func InitConfig(configFile string) {
+func InitConfig(configFile string, wxpd IWXPayDomain) {
 	configIns = &WXPayConfig{}
+
+	config, err := yaml.ReadFile(configFile)
+	if err != nil {
+		fmt.Printf("read %s failed: %s\n", configFile, err)
+	}
+	configIns.appID, _ = config.Get("appID")
+	configIns.mchID, _ = config.Get("mchID")
+	configIns.apiKey, _ = config.Get("apiKey")
+	configIns.cert, _ = config.Get("cert")
+	data, _ := config.GetInt("httpConnectTimeoutMs")
+	configIns.httpConnectTimeoutMs = int(data)
+	data, _ = config.GetInt("httpReadTimeoutMs")
+	configIns.httpReadTimeoutMs = int(data)
+	configIns.autoReport, _ = config.GetBool("autoReport")
+	data, _ = config.GetInt("reportWorkerNum")
+	configIns.reportWorkerNum = int(data)
+	data, _ = config.GetInt("reportQueueMaxSize")
+	configIns.reportQueueMaxSize = int(data)
+	data, _ = config.GetInt("reportBatchSize")
+	configIns.reportBatchSize = int(data)
+	configIns.wxPayDomain = wxpd
 }
 
 func GetConfigInstance() *WXPayConfig {
 	return configIns
 }
-
-///**
-// * 获取 App ID
-// *
-// * @return App ID
-// */
-//func (wxpc *WXPayConfig) getAppID() string {
-//	return wxpc.appID
-//}
-//
-///**
-// * 获取 Mch ID
-// *
-// * @return Mch ID
-// */
-//func (wxpc *WXPayConfig) getMchID() string {
-//	return wxpc.mchID
-//}
-//
-///**
-// * 获取 API 密钥
-// *
-// * @return API密钥
-// */
-//func (wxpc *WXPayConfig) getKey() string {
-//	return wxpc.apiKey
-//}
-//
-///**
-// * HTTP(S) 连接超时时间，单位毫秒
-// *
-// * @return
-// */
-//func (wxpc *WXPayConfig) getHttpConnectTimeoutMs() int {
-//	return wxpc.httpConnectTimeoutMs
-//}
-//
-///**
-// * HTTP(S) 读数据超时时间，单位毫秒
-// *
-// * @return
-// */
-//
-//func (wxpc *WXPayConfig) getHttpReadTimeoutMs() int {
-//	return wxpc.httpReadTimeoutMs
-//}

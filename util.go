@@ -75,11 +75,8 @@ func GenerateSignature(data Params, apiKey string, signType SignTypeEnum) (strin
 	return strings.ToUpper(str), nil
 }
 
-/**
- * 获取随机字符串 Nonce Str
- *
- * @return String 随机字符串
- */
+//获取随机字符串 Nonce Str
+//return String 32位随机字符串
 func GenerateNonceStr() string {
 	rand.Seed(time.Now().Unix())
 
@@ -172,15 +169,11 @@ func XmlToMap(strXML string) (Params, error) {
 	return data, nil
 }
 
-/**
- * 判断签名是否正确，必须包含sign字段，否则返回false。
- *
- * @param data Map类型数据
- * @param key API密钥
- * @param signType 签名方式
- * @return 签名是否正确
- * @throws Exception
- */
+// 判断签名是否正确，必须包含sign字段，否则返回false。
+// param data Map类型数据
+// param key API密钥
+// param signType 签名方式
+// return 签名是否正确
 func IsSignatureValid(data Params, apiKey string, signType SignTypeEnum) (bool, error) {
 	if _, ok := data[FIELD_SIGN]; !ok {
 		return false, nil

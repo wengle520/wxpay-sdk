@@ -13,10 +13,8 @@ import (
 	"time"
 )
 
-/**
- * 设置请求的连接超时时间和读取数据超时时间
- *
- */
+
+// 设置请求的连接超时时间和读取数据超时时间
 func TimeoutDialer(cTimeout time.Duration, rTimeout time.Duration) func(ctx context.Context, net string, addr string) (c net.Conn, err error) {
 	return func(ctx context.Context, netw string, addr string) (net.Conn, error) {
 		conn, err := net.DialTimeout(netw, addr, cTimeout)
@@ -28,17 +26,14 @@ func TimeoutDialer(cTimeout time.Duration, rTimeout time.Duration) func(ctx cont
 	}
 }
 
-/**
- * 请求，只请求一次，不做重试
- * @param domain
- * @param urlSuffix
- * @param uuid
- * @param data
- * @param connectTimeoutMs
- * @param readTimeoutMs
- * @param useCert 是否使用证书，针对退款、撤销等操作
- * @return
- */
+// 请求，只请求一次，不做重试
+// param domain
+// param urlSuffix
+// param uuid
+// param data
+// param connectTimeoutMs
+// param readTimeoutMs
+// param useCert 是否使用证书，针对退款、撤销等操作
 func requestOnce(domain string, urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int, useCert bool) (string, error) {
 	client := &http.Client{Transport:
 	&http.Transport{DialContext: TimeoutDialer(time.Duration(connectTimeoutMs), time.Duration(readTimeoutMs))}}
@@ -81,7 +76,7 @@ func requestOnce(domain string, urlSuffix string, uuid string, data string, conn
 	return string(body), nil
 }
 
-func request(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int, useCert bool, autoReport bool) (string, error) {
+func request(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int, useCert bool) (string, error) {
 	configIns := GetConfigInstance()
 
 	var elapsedTimeMillis = int64(0)
@@ -100,18 +95,22 @@ func request(urlSuffix string, uuid string, data string, connectTimeoutMs int, r
 		configIns.wxPayDomain.Report(domainInfo.domain, elapsedTimeMillis, err)
 		return "", err
 	}
+
+	// 上报耗时
 	elapsedTimeMillis = GetCurrentTimestampMs() - startTimestampMs
 	configIns.wxPayDomain.Report(domainInfo.domain, elapsedTimeMillis, nil)
+
+	// 上报当前这次请求
 	GetReportInstance(configIns).Report(uuid, elapsedTimeMillis, domainInfo.domain,
 		domainInfo.primaryDomain, connectTimeoutMs, readTimeoutMs,
 		firstHasDnsErr, firstHasConnectTimeout, firstHasReadTimeout)
 	return result, nil
 }
 
-func WXPayRequestWithoutCert(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int, autoReport bool) (string, error) {
-	return request(urlSuffix, uuid, data, connectTimeoutMs, readTimeoutMs, false, autoReport)
+func WXPayRequestWithoutCert(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int) (string, error) {
+	return request(urlSuffix, uuid, data, connectTimeoutMs, readTimeoutMs, false)
 }
 
-func WXPayRequestWithCert(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int, autoReport bool) (string, error) {
-
+func WXPayRequestWithCert(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int) (string, error) {
+	return "", nil
 }

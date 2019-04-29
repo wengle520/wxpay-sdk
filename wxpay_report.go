@@ -55,6 +55,7 @@ func NewReportInfo(uuid string, currentTimestamp int64, elapsedTimeMillis int64,
 	if firstHasReadTimeout {
 		reportInfo.firstHasReadTimeout = 1
 	}
+	return reportInfo
 }
 
 func (ri *ReportInfo) String() string {
@@ -173,29 +174,31 @@ func GetReportInstance(config *WXPayConfig) *WXPayReport {
 func (wxr *WXPayReport) Report(uuid string, elapsedTimeMillis int64,
 	firstDomain string, primaryDomain bool, firstConnectTimeoutMillis int, firstReadTimeoutMillis int,
 	firstHasDnsError bool, firstHasConnectTimeout bool, firstHasReadTimeout bool) {
-	configIns := GetConfigInstance()
-	currentTimestamp := GetCurrentTimestampMs()
-	reportInfo := NewReportInfo(uuid, currentTimestamp, elapsedTimeMillis,
-		firstDomain, primaryDomain, firstConnectTimeoutMillis, firstReadTimeoutMillis,
-		firstHasDnsError, firstHasConnectTimeout, firstHasReadTimeout)
-	data, err := reportInfo.toLineString(configIns.apiKey)
-	if err != nil {
-		errMsg := fmt.Sprintf("convert to cvs format failed: %s", err)
-		fmt.Println(errMsg)
-	}
-	fmt.Printf("report %s\n", data)
-	if data != "" {
-		ok := false
-		select {
-		case wxr.reportMsgQueue <- data:
-			ok = true
-		default:
-			ok = false
+		configIns := GetConfigInstance()
+		currentTimestamp := GetCurrentTimestampMs()
+
+		reportInfo := NewReportInfo(uuid, currentTimestamp, elapsedTimeMillis,
+			firstDomain, primaryDomain, firstConnectTimeoutMillis, firstReadTimeoutMillis,
+			firstHasDnsError, firstHasConnectTimeout, firstHasReadTimeout)
+		data, err := reportInfo.toLineString(configIns.apiKey)
+		if err != nil {
+			errMsg := fmt.Sprintf("convert to cvs format failed: %s", err)
+			fmt.Println(errMsg)
 		}
-		if !ok {
-			fmt.Printf("current reportMsgQueue has full, discard report: %s\n", data)
+		fmt.Printf("report %s\n", data)
+		if data != "" {
+			// for purpose of return immediately, when queue has full
+			ok := false
+			select {
+			case wxr.reportMsgQueue <- data:
+				ok = true
+			default:
+				ok = false
+			}
+			if !ok {
+				fmt.Printf("current reportMsgQueue has full, discard report: %s\n", data)
+			}
 		}
-	}
 }
 
 func (wxr *WXPayReport) httpRequest(data string, connectTimeoutMs int, readTimeoutMs int) (string, error) {
