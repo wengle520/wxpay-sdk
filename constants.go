@@ -33,7 +33,7 @@ const (
 )
 
 const (
-	USER_AGENT = WXPAYSDK_VERSION + " (" + runtime.GOARCH + runtime.GOOS + ") go/1.10.3" + "httpclient"
+	USER_AGENT = WXPAYSDK_VERSION + " (" + runtime.GOARCH + runtime.GOOS + ") go/1.10.3 " + "httpclient"
 )
 
 const (

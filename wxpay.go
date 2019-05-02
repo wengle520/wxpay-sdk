@@ -12,6 +12,12 @@ type WXPay struct {
 	notifyUrl  string
 }
 
+func NewWXPay(conf *WXPayConfig, signType   SignTypeEnum, useSandbox bool, notifyUrl  string) *WXPay {
+	wxp := &WXPay{config:conf, signType:signType, useSandbox:useSandbox, notifyUrl:notifyUrl}
+	// TODO start a goroutine for processing notice from notifyUrl
+	return wxp
+}
+
 // 作用：统一下单
 // 场景：公共号支付、扫码支付、APP支付
 // reqData 向wxpay post的请求数据
@@ -92,4 +98,254 @@ func (wxp *WXPay) processResponseXml(xmlStr string) (Params, error) {
 		return nil, errors.New(errMsg)
 	}
 	return respData, nil
+}
+
+func (wxp *WXPay) MicroPay(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_MICROPAY_URL_SUFFIX
+	} else {
+		url = MICROPAY_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) OrderQuery(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_ORDERQUERY_URL_SUFFIX
+	} else {
+		url = ORDERQUERY_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) Reverse(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_REVERSE_URL_SUFFIX
+	} else {
+		url = REVERSE_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) CloseOrder(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_CLOSEORDER_URL_SUFFIX
+	} else {
+		url = CLOSEORDER_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) Refund(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_REFUND_URL_SUFFIX
+	} else {
+		url = REFUND_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) RefundQuery(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_REFUNDQUERY_URL_SUFFIX
+	} else {
+		url = REFUNDQUERY_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) DownloadBill(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_DOWNLOADBILL_URL_SUFFIX
+	} else {
+		url = DOWNLOADBILL_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) Report(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_REPORT_URL_SUFFIX
+	} else {
+		url = REPORT_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) ShortUrl(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_SHORTURL_URL_SUFFIX
+	} else {
+		url = SHORTURL_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
+}
+
+func (wxp *WXPay) AuthCodeToOpenid(reqData Params) (Params, error) {
+	var url string
+	if wxp.useSandbox {
+		url = SANDBOX_AUTHCODETOOPENID_URL_SUFFIX
+	} else {
+		url = AUTHCODETOOPENID_URL_SUFFIX
+	}
+
+	connectTimeoutMs := wxp.config.httpConnectTimeoutMs
+	readTimeoutMs := wxp.config.httpReadTimeoutMs
+
+	if _, err := wxp.fillRequestData(reqData, wxp.config.apiKey, wxp.signType); err != nil {
+		return nil, err
+	}
+
+	msgUUID := reqData["nonce_str"]
+	reqBody := MapToXml(reqData)
+
+	respXml, err := WXPayRequestWithoutCert(url, msgUUID, reqBody, connectTimeoutMs, readTimeoutMs)
+	if err != nil {
+		return nil, err
+	}
+	return wxp.processResponseXml(respXml)
 }

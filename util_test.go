@@ -64,3 +64,22 @@ func TestXmlToMap(t *testing.T) {
 	t.Log(len(ret))
 	t.Log(ret)
 }
+
+func TestIsSignatureValid(t *testing.T) {
+	nonceStr := GenerateNonceStr()
+	data := Params{}
+	var signType SignTypeEnum
+	signType = HMACSHA256
+	data["appid"] = "12341231234"
+	data["mch_id"] = "xs max"
+	data["nonce_str"] = nonceStr
+	data["sign_type"] = HMACSHA256_STR
+	dataSign, _ := GenerateSignature(data, "bob123", signType)
+	data["sign"] = dataSign
+
+	valid, err := IsSignatureValid(data, "bob123", signType)
+	if !valid {
+		t.Error(err)
+	}
+	t.Log(valid)
+}

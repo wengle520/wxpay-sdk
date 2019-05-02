@@ -32,19 +32,17 @@ type IWXPayDomain interface {
 }
 
 // TODO 实现一个IWXPayDomain接口
-
 type DummyWXPayDomain struct {
-
 }
 
 func NewDummyWXPayDomain() IWXPayDomain {
 	return new(DummyWXPayDomain)
 }
 
-func (dwp *DummyWXPayDomain) Report(domain string, elapsedTimeMillis int64, err error)  {
+func (dwp *DummyWXPayDomain) Report(domain string, elapsedTimeMillis int64, err error) {
 
 }
 
 func (dwp *DummyWXPayDomain) GetDomain() DomainInfo {
-	return NewDomainInfo("api.mch.weixin.qq.com", true)
+	return NewDomainInfo(DOMAIN_API, true)
 }

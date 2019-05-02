@@ -10,6 +10,7 @@ func TestUnifiedOrder(t *testing.T) {
 	InitConfig(testConfigName, iwxpd)
 	config := GetConfigInstance()
 
+	// recommend to using NewWXPay
 	wxp := new(WXPay)
 	wxp.config = config
 	wxp.signType = MD5

@@ -9,7 +9,7 @@ import (
 
 func TestInitConfig(t *testing.T) {
 	// expected
-	iwxpd := new(DummyWXPayDomain)
+	iwxpd := NewDummyWXPayDomain()
 	configExpected := WXPayConfig{appID:"wx2421b1c4370ec43b", mchID:"10000100", autoReport:true, reportWorkerNum:6, wxPayDomain:iwxpd}
 
 	// test
