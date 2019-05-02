@@ -9,7 +9,7 @@ func TestGenerateNonceStr(t *testing.T) {
 	str := GenerateNonceStr()
 	if len(str) == length {
 		t.Log(str)
-	}else {
+	} else {
 		t.Error(str)
 	}
 }
@@ -19,12 +19,12 @@ func TestGenerateSignature(t *testing.T) {
 	data := Params{}
 	var signType SignTypeEnum
 	signType = HMACSHA256
-	data.SetStringParam("appid", "12341231234")
-	data.SetStringParam("mch_id", "wengle_5s")
-	data.SetStringParam("nonce_str", nonceStr)
-	data.SetStringParam("sign_type", HMACSHA256_STR)
-	dataSign, _ := GenerateSignature(data, "wengle123", signType)
-	data.SetStringParam("sign", dataSign)
+	data["appid"] = "12341231234"
+	data["mch_id"] = "xs max"
+	data["nonce_str"] = nonceStr
+	data["sign_type"] = HMACSHA256_STR
+	dataSign, _ := GenerateSignature(data, "bob123", signType)
+	data["sign"] = dataSign
 	t.Log(data)
 }
 
@@ -33,28 +33,27 @@ func TestMapToXml(t *testing.T) {
 	data := Params{}
 	var signType SignTypeEnum
 	signType = HMACSHA256
-	data.SetStringParam("appid", "12341231234")
-	data.SetStringParam("mch_id", "wengle_5s")
-	data.SetStringParam("nonce_str", nonceStr)
-	data.SetStringParam("sign_type", HMACSHA256_STR)
-	dataSign, _ := GenerateSignature(data, "wengle123", signType)
-	data.SetStringParam("sign", dataSign)
+	data["appid"] = "12341231234"
+	data["mch_id"] = "xs max"
+	data["nonce_str"] = nonceStr
+	data["sign_type"] = HMACSHA256_STR
+	dataSign, _ := GenerateSignature(data, "bob123", signType)
+	data["sign"] = dataSign
 	res := MapToXml(data)
 	t.Log(res)
 }
-
 
 func TestXmlToMap(t *testing.T) {
 	nonceStr := GenerateNonceStr()
 	data := Params{}
 	var signType SignTypeEnum
 	signType = HMACSHA256
-	data.SetStringParam("appid", "12341231234")
-	data.SetStringParam("mch_id", "wengle_5s")
-	data.SetStringParam("nonce_str", nonceStr)
-	data.SetStringParam("sign_type", HMACSHA256_STR)
-	dataSign, _ := GenerateSignature(data, "wengle123", signType)
-	data.SetStringParam("sign", dataSign)
+	data["appid"] = "12341231234"
+	data["mch_id"] = "xs max"
+	data["nonce_str"] = nonceStr
+	data["sign_type"] = HMACSHA256_STR
+	dataSign, _ := GenerateSignature(data, "bob123", signType)
+	data["sign"] = dataSign
 	res := MapToXml(data)
 	t.Log(res)
 

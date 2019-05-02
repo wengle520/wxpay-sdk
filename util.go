@@ -22,14 +22,11 @@ const XMLHEADER = `<?xml version="1.0" encoding="UTF-8"?>`
 // 属性的键值对容器
 type AttrMap map[string]string
 
-/**
- * 生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
- *
- * @param data 待签名数据
- * @param key API密钥
- * @param signType 签名方式
- * @return 签名
- */
+// 生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
+// param data 待签名数据
+// param key API密钥
+// param signType 签名方式
+// return 签名
 func GenerateSignature(data Params, apiKey string, signType SignTypeEnum) (string, error) {
 	keys := make([]string, 0, len(data))
 	for k := range data {
@@ -99,12 +96,9 @@ func start(tag string, attrs AttrMap) xml.StartElement {
 	return xml.StartElement{Name: xml.Name{Space: "", Local: tag}, Attr: attrSet}
 }
 
-/**
- * 将Map转换为XML格式的字符串
- *
- * @param data Map类型数据
- * @return XML格式的字符串
- */
+// 将Map转换为XML格式的字符串
+// param data Map类型数据
+// return XML格式的字符串
 func MapToXml(data Params) string {
 	// 创建编码器
 	buffer := new(bytes.Buffer)
@@ -131,13 +125,9 @@ func MapToXml(data Params) string {
 	return buffer.String()
 }
 
-/**
- * XML格式字符串转换为Map
- *
- * @param strXML XML字符串
- * @return XML数据转换后的Map
- * @throws Exception
- */
+// XML格式字符串转换为Map
+// param strXML XML字符串
+// return XML数据转换后的Map
 func XmlToMap(strXML string) (Params, error) {
 	data := make(Params)
 	reader := bytes.NewReader([]byte(strXML))
@@ -190,13 +180,10 @@ func GetCurrentTimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
-/**
- * 生成 HMACSHA256
- * @param data 待处理数据
- * @param key 密钥
- * @return 加密结果
- * @throws Exception
- */
+// 生成 HMACSHA256
+// param data 待处理数据
+// param key 密钥
+// return 加密结果
 func GenHMACSHA256(buffer *bytes.Buffer, apiKey string) string {
 	var sha256Set []byte
 	h := hmac.New(sha256.New, []byte(apiKey))

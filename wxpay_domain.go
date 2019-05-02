@@ -46,5 +46,5 @@ func (dwp *DummyWXPayDomain) Report(domain string, elapsedTimeMillis int64, err 
 }
 
 func (dwp *DummyWXPayDomain) GetDomain() DomainInfo {
-	return NewDomainInfo("test", true)
+	return NewDomainInfo("api.mch.weixin.qq.com", true)
 }

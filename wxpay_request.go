@@ -112,5 +112,5 @@ func WXPayRequestWithoutCert(urlSuffix string, uuid string, data string, connect
 }
 
 func WXPayRequestWithCert(urlSuffix string, uuid string, data string, connectTimeoutMs int, readTimeoutMs int) (string, error) {
-	return "", nil
+	return request(urlSuffix, uuid, data, connectTimeoutMs, readTimeoutMs, true)
 }
